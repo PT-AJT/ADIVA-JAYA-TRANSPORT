@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AJT - PT ADIVA JAYA TRANSPORT</title>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+
+<style>
+    :root {
+        --bg: #090a0f;
+        --card: #12141c;
+        --card-border: #222636;
+        --primary: #ff1e27;
+        --primary-hover: #e60000;
+        --primary-glow: rgba(255, 30, 39, 0.35);
+        --silver: #e2e8f0;
+        --silver-muted: #94a3b8;
+        --text: #ffffff;
+        --text-muted: #a1a1aa;
+        --border: #27272a;
+        --whatsapp: #25d366;
+        --success: #10b981;
+        --danger: #ef4444;
+        --navy-dropdown: #16213e;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif; }
+
+    body {
+        background: var(--bg);
+        color: var(--text);
+        min-height: 100vh;
+        padding: 20px;
+    }
+
+    .container {
+        background: var(--card);
+        border-radius: 20px;
+        padding: 30px;
+        max-width: 1400px;
+        margin: 0 auto;
+        border: 1px solid var(--card-border);
+        box-shadow: 0 0 50px rgba(0, 0, 0, 0.8), 0 0 20px var(--primary-glow);
+    }
+
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        flex-wrap: wrap;
+        gap: 20px;
+        border-bottom: 2px solid var(--border);
+        padding-bottom: 20px;
+    }
+
+    .brand-title {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .brand-title h1 {
+        font-size: 26px;
+        font-weight: 800;
+        letter-spacing: 1px;
+        background: linear-gradient(135deg, #ffffff 30%, #94a3b8 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-transform: uppercase;
+    }
+
+    .brand-title h1 span.sub-text {
+        display: block;
+        font-size: 13px;
+        color: var(--primary);
+        font-weight: 700;
+        letter-spacing: 2px;
+        margin-top: 2px;
+        -webkit-text-fill-color: initial;
+    }
+
+    .grid {
+        display: grid;
+        grid-template-columns: 460px 1fr;
+        gap: 30px;
+    }
+
+    @media (max-width: 1000px) {
+        .grid { grid-template-columns: 1fr; }
+    }
+
+    .form-group { margin-bottom: 18px; }
+
+    label {
+        display: block;
+        margin-bottom: 8px;
+        color: var(--silver);
+        font-weight: 600;
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    label i {
+        color: var(--primary);
+        margin-right: 6px;
+    }
+
+    select, input, button, textarea {
+        width: 100%;
+        padding: 12px 14px;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        font-size: 14px;
+        background: #181a24;
+        color: var(--text);
+        transition: all 0.3s ease;
+    }
+
+    select:focus, input:focus, textarea:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 12px var(--primary-glow);
+    }
+
+    /* Kustomisasi Choices.js agar Background Navy & Teks Putih */
+    .choices__inner {
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        min-height: 48px;
+        background: var(--navy-dropdown) !important;
+        color: var(--text) !important;
+    }
+
+    .choices__input {
+        background: transparent !important;
+        color: var(--text) !important;
+    }
+
+    .choices__list--dropdown {
+        background: var(--navy-dropdown) !important;
+        border: 1px solid var(--border) !important;
+        color: var(--text) !important;
+    }
+
+    .choices__list--dropdown .choices__item {
+        background: var(--navy-dropdown) !important;
+        color: var(--text) !important;
+    }
+
+    .choices__list--dropdown .choices__item--selectable.is-highlighted {
+        background-color: var(--primary) !important;
+        color: #ffffff !important;
+    }
+
+    .choices__item {
+        color: var(--text) !important;
+    }
+
+    .checkbox-group {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 15px;
+        background: rgba(255, 255, 255, 0.02);
+        padding: 10px 14px;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+    }
+
+    .checkbox-group input { width: auto; accent-color: var(--primary); }
+
+    button {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+        color: white;
+        border: none;
+        padding: 14px;
+        border-radius: 10px;
+        cursor: pointer;
+        font-weight: 700;
+        margin-top: 10px;
+        font-size: 15px;
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        box-shadow: 0 4px 15px var(--primary-glow);
+    }
+
+    button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(255, 30, 39, 0.5);
+    }
+
+    button.success { 
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%); 
+        box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+    }
+    button.whatsapp { 
+        background: linear-gradient(135deg, #25d366 0%, #1da851 100%); 
+        color: white; 
+        box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+    }
+    button.small { padding: 8px 12px; font-size: 12px; margin-top: 5px; }
+
+    .result {
+        margin-top: 20px;
+        padding: 20px;
+        background: rgba(255, 30, 39, 0.04);
+        border-radius: 12px;
+        display: none;
+        border: 1px solid rgba(255, 30, 39, 0.3);
+    }
+
+    .result.show { display: block; }
+
+    .result-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid var(--border);
+        font-size: 13px;
+    }
+
+    .result-item.per-orang {
+        background: rgba(16, 185, 129, 0.1);
+        margin: 10px 0;
+        padding: 10px 12px;
+        border-radius: 8px;
+        border: 1px solid rgba(16, 185, 129, 0.3);
+        font-weight: 600;
+        color: var(--success);
+    }
+
+    .result-item.total {
+        border-bottom: none;
+        font-weight: 800;
+        font-size: 18px;
+        color: var(--primary);
+        margin-top: 10px;
+        padding-top: 15px;
+        border-top: 2px solid var(--primary);
+    }
+
+    .label { color: var(--text-muted); }
+    .value { color: var(--text); font-weight: 600; }
+
+    #map { 
+        height: 550px; 
+        width: 100%;
+        border-radius: 12px; 
+        border: 1px solid var(--border);
+        z-index: 1;
+        background-color: var(--navy-dropdown) !important;
+    }
+
+    .leaflet-popup-content-wrapper, .leaflet-popup-tip {
+        background: var(--navy-dropdown) !important;
+        color: #ffffff !important;
+        font-weight: 600;
+    }
+    .leaflet-popup-content {
+        color: #ffffff !important;
+    }
+    .leaflet-routing-container {
+        background-color: var(--navy-dropdown) !important;
+        color: #ffffff !important;
+        padding: 10px;
+        border-radius: 8px;
+    }
+    .leaflet-routing-alt {
+        background-color: var(--navy-dropdown) !important;
+        color: #ffffff !important;
+        max-height: 180px;
+        overflow-y: auto;
+    }
+
+    .hidden { display: none; }
+
+    .stop-item {
+        background: rgba(255, 255, 255, 0.03);
+        padding: 12px;
+        border-radius: 8px;
+        margin-bottom: 10px;
+        border: 1px solid var(--border);
+    }
+
+    .loading {
+        text-align: center;
+        color: var(--primary);
+        padding: 15px;
+        font-weight: 600;
+    }
+
+    .car-icon { font-size: 28px; }
+
+    .action-buttons {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+
+    .badge {
+        display: inline-block;
+        padding: 3px 8px;
+        background: var(--success);
+        color: white;
+        border-radius: 20px;
+        font-size: 11px;
+        margin-left: 5px;
+    }
+
+    .error-msg {
+        color: var(--danger);
+        font-size: 12px;
+        margin-top: 5px;
+        display: none;
+    }
+
+    .error-msg.show { display: block; }
+
+    .booking-schedule-box {
+        background: rgba(255, 30, 39, 0.03);
+        border: 1px dashed rgba(255, 30, 39, 0.4);
+        padding: 15px;
+        border-radius: 12px;
+        margin-bottom: 18px;
+    }
+    .schedule-time-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-top: 8px;
+    }
+
+    .cargo-notice {
+        background: rgba(37, 211, 102, 0.05);
+        border: 1px dashed #25d366;
+        padding: 12px;
+        border-radius: 8px;
+        margin-top: 15px;
+        font-size: 12px;
+        color: #e2e8f0;
+        line-height: 1.5;
+    }
+    .cargo-notice a {
+        color: #25d366;
+        font-weight: bold;
+        text-decoration: none;
+    }
+</style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div class="brand-title">
+            <i class="fas fa-crown" style="font-size: 32px; color: var(--primary);"></i>
+            <h1>
+                PT ADIVA JAYA TRANSPORT
+                <span class="sub-text">AJT - LAYANAN TRAVEL KALIMANTAN SELATAN</span>
+            </h1>
+        </div>
+    </div>
+
+    <div class="grid">
+        <div>
+            <div class="form-group">
+                <label><i class="fas fa-user"></i> Nama Pemesan</label>
+                <input type="text" id="namaPelanggan" placeholder="Masukkan nama Anda" required>
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-phone"></i> Nomor WhatsApp Pemesan</label>
+                <input type="tel" id="telpPelanggan" placeholder="Contoh: 081234567890" required>
+            </div>
+
+            <div class="booking-schedule-box">
+                <label><i class="fas fa-calendar-alt"></i> Jadwal Sesi Perjalanan</label>
+                <div class="form-group" style="margin-bottom: 8px;">
+                    <input type="date" id="tanggalBooking" required>
+                </div>
+                <div class="schedule-time-grid">
+                    <div>
+                        <label style="font-size:11px; color:var(--text-muted);">Mulai Jam</label>
+                        <select id="jamMulai">
+                            <option value="07:00">07:00 WITA</option>
+                            <option value="08:00">08:00 WITA</option>
+                            <option value="09:00">09:00 WITA</option>
+                            <option value="10:00">10:00 WITA</option>
+                            <option value="13:00">13:00 WITA</option>
+                            <option value="14:00">14:00 WITA</option>
+                            <option value="16:00">16:00 WITA</option>
+                            <option value="19:00">19:00 WITA</option>
+                            <option value="20:00">20:00 WITA</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="font-size:11px; color:var(--text-muted);">Selesai (Est)</label>
+                        <select id="jamSelesai">
+                            <option value="10:00">10:00 WITA</option>
+                            <option value="11:00">11:00 WITA</option>
+                            <option value="12:00">12:00 WITA</option>
+                            <option value="14:00">14:00 WITA</option>
+                            <option value="16:00">16:00 WITA</option>
+                            <option value="17:00">17:00 WITA</option>
+                            <option value="20:00">20:00 WITA</option>
+                            <option value="22:00">22:00 WITA</option>
+                            <option value="23:00">23:00 WITA</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label><i class="fas fa-map-marker-alt"></i> Kota Asal</label>
+                <select id="asal"></select>
+            </div>
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="jemputAlamat">
+                <label for="jemputAlamat" style="margin:0; text-transform:none;">Jemput di Alamat / Door to Door</label>
+            </div>
+
+            <div id="alamatJemput" class="hidden">
+                <div class="form-group">
+                    <label>Alamat Jemput Lengkap</label>
+                    <textarea id="alamatJemputText" rows="2" placeholder="Contoh: Jl. Ahmad Yani Km. 6, Banjarmasin"></textarea>
+                    <div class="error-msg" id="errJemput">Alamat tidak ditemukan!</div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label><i class="fas fa-map-marker"></i> Kota Tujuan</label>
+                <select id="tujuan"></select>
+            </div>
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="antarAlamat">
+                <label for="antarAlamat" style="margin:0; text-transform:none;">Antar ke Alamat Tujuan <span class="badge">Gratis (Rp 0)</span></label>
+            </div>
+
+            <div id="alamatAntar" class="hidden">
+                <div class="form-group">
+                    <label>Alamat Tujuan Lengkap</label>
+                    <textarea id="alamatAntarText" rows="2" placeholder="Contoh: Jl. Pelabuhan No. 12, Batulicin"></textarea>
+                    <div class="error-msg" id="errAntar">Alamat tidak ditemukan!</div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label><i class="fas fa-route"></i> Titik Pemberhentian Khusus (Opsional)</label>
+                <div id="stopList"></div>
+                <button type="button" class="small" onclick="tambahStop()">
+                    <i class="fas fa-plus"></i> Tambah Pemberhentian
+                </button>
+            </div>
+
+            <div class="form-group">
+                <label><i class="fas fa-exchange-alt"></i> Jenis Perjalanan</label>
+                <select id="jenisPerjalanan">
+                    <option value="sekali">Pergi Saja (Satu Arah)</option>
+                    <option value="pp">Pulang Pergi (PP) (1.7x Tarif)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label><i class="fas fa-users"></i> Jumlah Penumpang</label>
+                <input type="number" id="jumlahPenumpang" value="1" min="1" max="20">
+            </div>
+
+            <div class="form-group">
+                <label><i class="fas fa-suitcase"></i> Jumlah Koper / Barang Bawaan</label>
+                <input type="number" id="koper" value="1" min="0" max="10">
+                <small style="color:var(--success);">✨ 2 Koper Pertama Gratis! Koper ke-3 dan seterusnya +Rp 50.000/koper.</small>
+            </div>
+
+            <div class="form-group">
+                <label><i class="fas fa-headset"></i> Pilih Admin Tujuan Booking (WhatsApp)</label>
+                <select id="pilihanAdmin">
+                    <option value="6285245483375">YHAN - 0852-4548-3375</option>
+                    <option value="6281521664365">ADI - 0815-2166-4365</option>
+                </select>
+            </div>
+
+            <div class="cargo-notice">
+                <i class="fas fa-box-open"></i> <b>Pengiriman Cargo Barang/Paket:</b> Ingin mengirimkan paket atau barang besar dalam jumlah banyak? Silakan konsultasikan terlebih dahulu ke admin WhatsApp kami sebelum memesan. <a href="https://api.whatsapp.com/send?phone=6285245483375&text=Halo%20Admin%20AJT,%20saya%20ingin%20konsultasi%20pengiriman%20cargo" target="_blank">Chat Admin <i class="fas fa-external-link-alt"></i></a>
+            </div>
+
+            <button onclick="hitung()" style="margin-top: 15px;">
+                <i class="fas fa-calculator"></i> Hitung Tarif & Cek Jadwal AJT
+            </button>
+
+            <button class="whatsapp" id="btnKirimOrder" onclick="kirimKeAdmin()" style="display:none;">
+                <i class="fab fa-whatsapp"></i> Pesan via WhatsApp Pilihan Admin
+            </button>
+
+            <div class="action-buttons">
+                <button class="success" onclick="salinPesanan()">
+                    <i class="fas fa-copy"></i> Salin Struk
+                </button>
+                <button class="success" onclick="exportPDF()">
+                    <i class="fas fa-file-pdf"></i> Download PDF
+                </button>
+            </div>
+
+            <div id="loading" class="loading hidden">
+                <i class="fas fa-spinner fa-spin"></i> Memvalidasi rute tarif fix AJT & cek ketersediaan jadwal...
+            </div>
+
+            <div class="result" id="result">
+                <div class="result-item">
+                    <span class="label">Jadwal Sesi Booking</span>
+                    <span class="value" id="resJadwalSesi" style="color:var(--primary); font-weight:bold;">-</span>
+                </div>
+                <div class="result-item">
+                    <span class="label">Estimasi Jarak & Waktu</span>
+                    <span class="value" id="jarak">0 km (0 jam)</span>
+                </div>
+                <div class="result-item">
+                    <span class="label">Rute Perjalanan</span>
+                    <span class="value" id="resRuteText">-</span>
+                </div>
+                <div class="result-item">
+                    <span class="label">Tarif Dasar Per Orang (Fix Route)</span>
+                    <span class="value" id="biayaDasarPerOrang">Rp 0</span>
+                </div>
+                
+                <div class="result-item" id="rowKoper" style="display:none;">
+                    <span class="label">Tambahan Koper (Mulai Koper ke-3)</span>
+                    <span class="value" id="biayaKoper">Rp 0</span>
+                </div>
+                <div class="result-item per-orang">
+                    <span class="label" style="color: var(--success);">Rata-rata Per Orang</span>
+                    <span class="value" id="totalPerOrang">Rp 0</span>
+                </div>
+                <div class="result-item total">
+                    <span class="label">Total Keseluruhan (AJT)</span>
+                    <span class="value" id="totalSemua">Rp 0</span>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <label><i class="fas fa-map"></i> Peta Rute Layanan AJT Kalsel</label>
+            <div id="map"></div>
+            <div class="caption" id="captionRute" style="margin-top:10px; font-size:13px; color:var(--text-muted);">
+                Silakan pilih kota Asal dan Tujuan untuk melihat rute perjalanan PT Adiva Jaya Transport secara real-time.
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<script>
+// ================= KONFIGURASI AJT =================
+const KOTA = {
+    "Martapura": [-3.411154, 114.843222],
+    "Banjarmasin": [-3.3194, 114.5908],
+    "Banjarbaru": [-3.4447, 114.8301],
+    "Pelaihari": [-3.9497, 114.7608],
+    "Bati Bati": [-3.6015, 114.7352],
+    "Asam Asam": [-3.8379, 115.1165],
+    "Kintap": [-3.8542, 115.3589],
+    "Sungai Danau": [-3.7833, 115.5333],
+    "Sebamban": [-3.6281, 115.7194],
+    "Pagatan": [-3.3619, 116.0353],
+    "Batulicin": [-3.4416, 116.0276],
+    "Serongga": [-3.0562, 116.1437],
+    "Cantung": [-2.7533, 116.1667],
+    "Magalau": [-2.8500, 116.1167],
+    "Geronggang": [-2.5667, 115.9833],
+    "Dugan": [-2.6000, 115.9000],
+    "Tanjung Batu": [-3.0333, 116.1000],
+    "Senakin": [-2.5000, 116.1000],
+    "Pudi": [-3.1500, 116.1500],
+    "Kotabaru": [-3.2927, 116.2076],
+    "Angsana": [-3.5333, 115.8000]
+};
+
+function getTarifKhusus(asal, tujuan) {
+    let a = asal.toLowerCase();
+    let t = tujuan.toLowerCase();
+    
+    if ((a.includes('banjarmasin') || a.includes('martapura') || a.includes('banjarbaru')) && 
+        (t.includes('angsana') || t.includes('sebamban'))) return 250000;
+    if ((t.includes('banjarmasin') || t.includes('martapura') || t.includes('banjarbaru')) && 
+        (a.includes('angsana') || a.includes('sebamban'))) return 250000;
+
+    if (t.includes('sungai danau') || a.includes('sungai danau')) return 200000;
+    if (t.includes('batulicin') || a.includes('batulicin')) return 300000;
+    if (t.includes('serongga') || a.includes('serongga')) return 300000;
+    
+    if (t.includes('cantung') || t.includes('magalau') || t.includes('geronggang') || t.includes('dugan') ||
+        a.includes('cantung') || a.includes('magalau') || a.includes('geronggang') || a.includes('dugan')) return 400000;
+
+    if (t.includes('tanjung batu') || t.includes('pudi') || t.includes('senakin') ||
+        a.includes('tanjung batu') || a.includes('pudi') || a.includes('senakin')) return 450000;
+
+    if (t.includes('kotabaru') || a.includes('kotabaru')) return 350000;
+
+    return 200000;
+}
+
+const map = L.map('map', { zoomControl: true }).setView([-3.3194, 114.5908], 9);
+L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+    maxZoom: 20,
+    subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+    attribution: '© Google Maps'
+}).addTo(map);
+
+setTimeout(() => { map.invalidateSize(); }, 300);
+
+let routingControl, carMarker, routeCoords = [];
+let animationInterval;
+let stopCount = 0;
+let stops = [];
+
+const asalChoice = new Choices('#asal', { searchEnabled: true, itemSelectText: '' });
+const tujuanChoice = new Choices('#tujuan', { searchEnabled: true, itemSelectText: '' });
+const adminChoice = new Choices('#pilihanAdmin', { searchEnabled: false, itemSelectText: '' });
+
+const kotaOptions = Object.keys(KOTA).map(k => ({value: k, label: k}));
+asalChoice.setChoices(kotaOptions, 'value', 'label', true);
+tujuanChoice.setChoices(kotaOptions, 'value', 'label', true);
+asalChoice.setValue([{value: 'Banjarmasin', label: 'Banjarmasin'}]);
+tujuanChoice.setValue([{value: 'Batulicin', label: 'Batulicin'}]);
+
+document.getElementById('tanggalBooking').valueAsDate = new Date();
+
+document.getElementById('jemputAlamat').addEventListener('change', function() {
+    document.getElementById('alamatJemput').classList.toggle('hidden', !this.checked);
+});
+document.getElementById('antarAlamat').addEventListener('change', function() {
+    document.getElementById('alamatAntar').classList.toggle('hidden', !this.checked);
+});
+
+function tambahStop() {
+    stopCount++;
+    const stopId = `stop_${stopCount}`;
+    const html = `
+        <div class="stop-item" id="${stopId}">
+            <label>Pemberhentian ${stopCount}</label>
+            <input type="text" id="stopText_${stopId}" placeholder="Contoh: Lokasi transit / jemput">
+            <button type="button" class="danger small" onclick="hapusStop('${stopId}')">
+                <i class="fas fa-trash"></i> Hapus
+            </button>
+        </div>
+    `;
+    document.getElementById('stopList').insertAdjacentHTML('beforeend', html);
+    stops.push(stopId);
+}
+
+function hapusStop(id) {
+    document.getElementById(id).remove();
+    stops = stops.filter(s => s !== id);
+}
+
+async function geocodeAlamat(alamat, kota) {
+    const query = encodeURIComponent(`${alamat}, ${kota}, Kalimantan Selatan, Indonesia`);
+    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${query}&limit=1`;
+    try {
+        const res = await fetch(url);
+        const data = await res.json();
+        if (data.length > 0) return [parseFloat(data[0].lat), parseFloat(data[0].lon)];
+        return null;
+    } catch (err) { return null; }
+}
+
+async function hitung() {
+    const nama = document.getElementById('namaPelanggan').value.trim();
+    const telp = document.getElementById('telpPelanggan').value.trim();
+    const tglBooking = document.getElementById('tanggalBooking').value;
+    const jamMulai = document.getElementById('jamMulai').value;
+    const jamSelesai = document.getElementById('jamSelesai').value;
+
+    if (!nama || !telp || !tglBooking) {
+        alert("Silakan lengkapi Nama, WhatsApp, dan Tanggal Booking!");
+        return;
+    }
+
+    if (jamMulai >= jamSelesai) {
+        alert("Jam Selesai harus lebih lambat dari Jam Mulai!");
+        return;
+    }
+
+    const asal = asalChoice.getValue(true);
+    const tujuan = tujuanChoice.getValue(true);
+    const pakaiAlamatJemput = document.getElementById('jemputAlamat').checked;
+    const alamatJemput = document.getElementById('alamatJemputText').value.trim();
+    const pakaiAlamatAntar = document.getElementById('antarAlamat').checked;
+    const alamatAntar = document.getElementById('alamatAntarText').value.trim();
+    const jnsPerjalanan = document.getElementById('jenisPerjalanan').value;
+    const koper = parseInt(document.getElementById('koper').value) || 0;
+    const penumpang = parseInt(document.getElementById('jumlahPenumpang').value) || 1;
+
+    if (penumpang <= 0) {
+        alert("Jumlah penumpang minimal harus 1 orang!");
+        return;
+    }
+
+    if (asal === tujuan) {
+        alert("Kota asal dan tujuan tidak boleh sama!");
+        return;
+    }
+
+    document.getElementById('loading').classList.remove('hidden');
+    document.getElementById('result').classList.remove('show');
+
+    if (routingControl) map.removeControl(routingControl);
+    if (carMarker) map.removeLayer(carMarker);
+    if (animationInterval) clearInterval(animationInterval);
+
+    let titikAwal = KOTA[asal] || [-3.3194, 114.5908]; 
+    let titikAkhir = KOTA[tujuan] || [-3.4416, 116.0276];
+
+    if (pakaiAlamatJemput && alamatJemput) {
+        const coord = await geocodeAlamat(alamatJemput, asal);
+        if (coord) titikAwal = coord;
+    }
+    if (pakaiAlamatAntar && alamatAntar) {
+        const coord = await geocodeAlamat(alamatAntar, tujuan);
+        if (coord) titikAkhir = coord;
+    }
+
+    let waypoints = [L.latLng(titikAwal[0], titikAwal[1])];
+    for (let stopId of stops) {
+        const stopText = document.getElementById(`stopText_${stopId}`).value.trim();
+        if (stopText) {
+            const coord = await geocodeAlamat(stopText, asal);
+            if (coord) waypoints.push(L.latLng(coord[0], coord[1]));
+        }
+    }
+    waypoints.push(L.latLng(titikAkhir[0], titikAkhir[1]));
+    document.getElementById('loading').classList.add('hidden');
+
+    routingControl = L.Routing.control({
+        waypoints: waypoints,
+        routeWhileDragging: false,
+        showAlternatives: false,
+        addWaypoints: false,
+        lineOptions: { styles: [{color: '#ff1e27', weight: 6}] },
+        createMarker: function(i, waypoint) {
+            let namaPlace = (i === 0) ? asal : ((i === waypoints.length - 1) ? tujuan : `Transit`);
+            return L.marker(waypoint.latLng).bindPopup(`<b>${namaPlace}</b>`);
+        },
+        router: L.Routing.osrmv1({ language: 'id' })
+    }).on('routesfound', function(e) {
+        const route = e.routes[0];
+        routeCoords = route.coordinates;
+        const jarakKm = (route.summary.totalDistance / 1000).toFixed(1);
+        const waktuJam = (route.summary.totalTime / 3600).toFixed(1);
+
+        map.invalidateSize();
+
+        const carIcon = L.divIcon({ html: '🚐', className: 'car-icon', iconSize: [35, 35] });
+        carMarker = L.marker(routeCoords[0], { icon: carIcon }).addTo(map);
+        map.setView(routeCoords[0], 9);
+
+        let i = 0;
+        animationInterval = setInterval(() => {
+            if (i < routeCoords.length) {
+                carMarker.setLatLng(routeCoords[i]);
+                map.panTo(routeCoords[i], { animate: true });
+                i += Math.max(1, Math.floor(routeCoords.length / 150)); 
+            } else {
+                clearInterval(animationInterval);
+                map.fitBounds(L.latLngBounds(routeCoords));
+            }
+        }, 80);
+
+        const multiplier = (jnsPerjalanan === 'pp') ? 1.7 : 1.0;
+        let tarifDasarPerOrang = getTarifKhusus(asal, tujuan);
+        let tarifDasarTotal = tarifDasarPerOrang * penumpang * multiplier;
+
+        let biayaAntar = 0; 
+        let biayaKoper = koper > 2 ? ((koper - 2) * 50000) : 0;
+
+        let totalSemua = tarifDasarTotal + biayaAntar + biayaKoper;
+        let perOrangRerata = Math.round(totalSemua / penumpang);
+
+        document.getElementById('resJadwalSesi').textContent = `${tglBooking} [${jamMulai} - ${jamSelesai}]`;
+        document.getElementById('jarak').textContent = `${jarakKm} km (${waktuJam} jam)`;
+        document.getElementById('resRuteText').textContent = `${asal} → ${tujuan} (${jnsPerjalanan === 'pp' ? 'Pulang Pergi' : 'Sekali Jalan'})`;
+        document.getElementById('biayaDasarPerOrang').textContent = `Rp ${tarifDasarPerOrang.toLocaleString('id-ID')}`;
+        
+        document.getElementById('biayaKoper').textContent = `Rp ${biayaKoper.toLocaleString('id-ID')} (${koper} Koper - 2 Gratis)`;
+        document.getElementById('totalPerOrang').textContent = `Rp ${perOrangRerata.toLocaleString('id-ID')}`;
+        document.getElementById('totalSemua').textContent = `Rp ${totalSemua.toLocaleString('id-ID')}`;
+
+        document.getElementById('rowKoper').style.display = koper > 2 ? 'flex' : 'none';
+
+        document.getElementById('result').classList.add('show');
+        document.getElementById('btnKirimOrder').style.display = 'flex';
+
+    }).on('routingerror', function(err) {
+        document.getElementById('loading').classList.add('hidden');
+        alert('Gagal menampilkan visual rute peta. Tarif tetap valid sesuai pilihan rute Anda.');
+    }).addTo(map);
+}
+
+function kirimKeAdmin() {
+    const nama = document.getElementById('namaPelanggan').value;
+    const telp = document.getElementById('telpPelanggan').value;
+    const asal = asalChoice.getValue(true);
+    const tujuan = tujuanChoice.getValue(true);
+    const tgl = document.getElementById('tanggalBooking').value;
+    const jm = document.getElementById('jamMulai').value;
+    const js = document.getElementById('jamSelesai').value;
+    const total = document.getElementById('totalSemua').textContent;
+    const koper = document.getElementById('koper').value;
+    const penumpang = document.getElementById('jumlahPenumpang').value;
+    const targetAdminWA = document.getElementById('pilihanAdmin').value;
+
+    const pesanWA = `*BOOKING AJT (PT ADIVA JAYA TRANSPORT)*\n` +
+                    `--------------------------------\n` +
+                    `📅 *Tanggal:* ${tgl}\n` +
+                    `⏰ *Sesi Jam:* ${jm} - ${js} WITA\n` +
+                    `👤 *Nama:* ${nama}\n` +
+                    `📞 *WhatsApp:* ${telp}\n` +
+                    `📍 *Rute:* ${asal} → ${tujuan}\n` +
+                    `👥 *Penumpang:* ${penumpang} Orang\n` +
+                    `🧳 *Koper:* ${koper} Buah\n` +
+                    `💰 *TOTAL BIAYA:* ${total}\n` +
+                    `--------------------------------\n` +
+                    `Mohon konfirmasi jadwal armada & penjemputan, terima kasih!`;
+
+    const urlWA = `https://api.whatsapp.com/send?phone=${targetAdminWA}&text=${encodeURIComponent(pesanWA)}`;
+    window.open(urlWA, '_blank');
+}
+
+function salinPesanan() {
+    const total = document.getElementById('totalSemua').textContent;
+    if(total === "Rp 0") { alert("Hitung tarif rute terlebih dahulu!"); return; }
+    
+    const text = `*STRUK RESERVASI PT ADIVA JAYA TRANSPORT (AJT)*\n` +
+                 `Pemesan: ${document.getElementById('namaPelanggan').value}\n` +
+                 `Rute: ${asalChoice.getValue(true)} → ${tujuanChoice.getValue(true)}\n` +
+                 `Jadwal: ${document.getElementById('tanggalBooking').value} [${document.getElementById('jamMulai').value} - ${document.getElementById('jamSelesai').value}]\n` +
+                 `Total: ${total}`;
+    navigator.clipboard.writeText(text);
+    alert("Struk pemesanan berhasil disalin ke clipboard!");
+}
+
+function exportPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    const total = document.getElementById('totalSemua').textContent;
+    if(total === "Rp 0") { alert("Hitung tarif terlebih dahulu!"); return; }
+
+    doc.setFontSize(18);
+    doc.text('PT ADIVA JAYA TRANSPORT (AJT)', 20, 20);
+    doc.setFontSize(12);
+    doc.text(`Nama Pemesan: ${document.getElementById('namaPelanggan').value}`, 20, 35);
+    doc.text(`Rute Perjalanan: ${asalChoice.getValue(true)} ke ${tujuanChoice.getValue(true)}`, 20, 45);
+    doc.text(`Jadwal Sesi: ${document.getElementById('tanggalBooking').value} (${document.getElementById('jamMulai').value})`, 20, 55);
+    doc.text(`Total Biaya: ${total}`, 20, 65);
+    doc.save(`struk-ajt-${Date.now()}.pdf`);
+}
+</script>
+</body>
+</html>
